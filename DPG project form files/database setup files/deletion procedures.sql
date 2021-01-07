@@ -28,6 +28,8 @@ BEGIN
         DELETE FROM Service_Rendered WHERE Service_Rendered_ID=@id 
     if(@table=9)
         DELETE FROM Product_Sold WHERE Product_Sold_ID=@id 
+    if(@table<1 OR @table>9)
+        THROW 50001,'Invalid parameters provided',19
 END
 go
 

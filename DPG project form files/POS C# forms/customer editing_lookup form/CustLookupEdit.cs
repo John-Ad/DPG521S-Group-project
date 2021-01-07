@@ -344,13 +344,12 @@ namespace customer_lookup_editing_form
                 String updateStatement;
                 if (cboFavHair.Text != "")
                 {
-                    updateStatement = "exec sp_updateCustomer " + txtID.Text + "," + table.Rows[0][0].ToString() + ",'" + cboCustName.Text + "'," + txtCellNum.Text + "," + txtNumOfVis.Text;
+                    updateStatement = "exec sp_updateCustomer " + txtID.Text + "," + table.Rows[0][0].ToString() + ",'" + cboCustName.Text + "','" + txtCellNum.Text + "'," + txtNumOfVis.Text;
                 }
                 else
                 {
-                    updateStatement = "exec sp_updateCustomer " + txtID.Text + ",null" + ",'" + cboCustName.Text + "'," + txtCellNum.Text + "," + txtNumOfVis.Text;
+                    updateStatement = "exec sp_updateCustomer " + txtID.Text + ",null" + ",'" + cboCustName.Text + "','" + txtCellNum.Text + "'," + txtNumOfVis.Text;
                 }
-                //txtSearch.Text = updateStatement;
                 if (connection.State != ConnectionState.Open)       //connection seems to time out or close for other reasons when at this point
                 {
                     connection.Open();
@@ -363,6 +362,8 @@ namespace customer_lookup_editing_form
                 catch (SqlException ex)
                 {
                     MessageBox.Show(ex.Message, "Failed to update record", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    txtSearch.Text = updateStatement;
+                    txtSearch.Enabled = true;
                     return;
                 }
             }
@@ -371,11 +372,11 @@ namespace customer_lookup_editing_form
                 String updateStatement;
                 if (cboFavHair.Text != "")
                 {
-                    updateStatement = "exec sp_CustInsert " + table.Rows[0][0].ToString() + ",'" + cboCustName.Text + "'," + txtCellNum.Text + "," + txtNumOfVis.Text;
+                    updateStatement = "exec sp_CustInsert " + table.Rows[0][0].ToString() + ",'" + cboCustName.Text + "','" + txtCellNum.Text + "'," + txtNumOfVis.Text;
                 }
                 else
                 {
-                    updateStatement = "exec sp_CustInsert 0" + ",'" + cboCustName.Text + "'," + txtCellNum.Text + "," + txtNumOfVis.Text;
+                    updateStatement = "exec sp_CustInsert null" + ",'" + cboCustName.Text + "','" + txtCellNum.Text + "'," + txtNumOfVis.Text;
                 }
                 if (connection.State != ConnectionState.Open)       //connection seems to time out or close for other reasons when at this point
                 {
@@ -444,6 +445,14 @@ namespace customer_lookup_editing_form
         private void btnDone_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void txtCellNum_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))      //allow only digits and control key presses
+            {
+                e.Handled = true;
+            }
         }
     }
 }

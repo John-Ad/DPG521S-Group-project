@@ -1,6 +1,7 @@
 use DPGtestDB
 go
 
+/*
 DROP PROC IF EXISTS sp_SearchByName
 go
 CREATE PROC sp_SearchByName
@@ -31,5 +32,7 @@ go
 
 exec sp_SearchByName 'oe',3
 go
+*/
 
-
+SELECT * from Service_Rendered
+SELECT * from Product_Sold

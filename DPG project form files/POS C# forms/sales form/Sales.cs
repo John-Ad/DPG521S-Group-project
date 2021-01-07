@@ -54,7 +54,7 @@ namespace DPG_sales_form
                 //establish command objects
                 hairCommand = new SqlCommand("SELECT * FROM Haircut", connection);
                 prodCommand = new SqlCommand("SELECT * FROM Product", connection);
-                empCommand = new SqlCommand("SELECT * FROM Employee WHERE Employee_ID=1", connection);
+                empCommand = new SqlCommand("SELECT * FROM Employee WHERE Employee_ID=3001", connection);
                 custCommand = new SqlCommand("SELECT * FROM Customer", connection);
                 barberCommand = new SqlCommand("SELECT * FROM Employee WHERE Position_ID=3", connection);
                 //establish data adapters and tables
@@ -188,11 +188,11 @@ namespace DPG_sales_form
 
             if(cboHairName.SelectedIndex != -1)     //if cboHairName is in use
             {
-                dbInsertQuery += "exec sp_ServRendInsert " + barberTable.Rows[cboBarberName.SelectedIndex][1].ToString() + "," + txtCustID.Text + "," + txtHairProdID.Text + "," + "'" + cboCustName.Text + "'" + "," + txtTotal.Text + "\r\n";
+                dbInsertQuery += "exec sp_ServRendInsert " + barberTable.Rows[cboBarberName.SelectedIndex][0].ToString() + "," + txtCustID.Text + "," + txtHairProdID.Text + "," + "'" + cboCustName.Text + "'" + "," + txtQuantity.Text + "," + (float.Parse(txtQuantity.Text) * float.Parse(txtPrice.Text)).ToString() + "\r\n";
             }
             else
             {
-                dbInsertQuery += "exec sp_ProdSoldInsert " + txtEmpID.Text + "," + txtCustID.Text + "," + txtHairProdID.Text + "," + "'" + cboCustName.Text + "'" + "," + txtTotal.Text + "\r\n";
+                dbInsertQuery += "exec sp_ProdSoldInsert " + txtEmpID.Text + "," + txtCustID.Text + "," + txtHairProdID.Text + "," + "'" + cboCustName.Text + "'" + "," + txtQuantity.Text + "," + (float.Parse(txtQuantity.Text) * float.Parse(txtPrice.Text)).ToString() + "\r\n";
             }
 
             //txtItemList.AppendText(dbInsertQuery + "\r\n");
@@ -231,6 +231,7 @@ namespace DPG_sales_form
             cboBarberName.Enabled = false;
             txtPrice.Text = "";
             txtQuantity.Text = "";
+            txtItemList.Text = "";
         }
 
         

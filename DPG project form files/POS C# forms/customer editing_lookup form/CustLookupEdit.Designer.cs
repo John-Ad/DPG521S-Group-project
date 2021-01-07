@@ -215,10 +215,13 @@
             // 
             this.txtCellNum.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.txtCellNum.Font = new System.Drawing.Font("Segoe UI", 19F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.txtCellNum.ImeMode = System.Windows.Forms.ImeMode.NoControl;
             this.txtCellNum.Location = new System.Drawing.Point(1, 163);
+            this.txtCellNum.MaxLength = 10;
             this.txtCellNum.Name = "txtCellNum";
             this.txtCellNum.Size = new System.Drawing.Size(290, 41);
             this.txtCellNum.TabIndex = 0;
+            this.txtCellNum.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtCellNum_KeyPress);
             // 
             // txtID
             // 

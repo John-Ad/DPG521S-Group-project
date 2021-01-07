@@ -8,7 +8,7 @@ CREATE PROC sp_updateHaircut(
     @id AS int,
     @hName AS varchar(20),
     @hdesc AS varchar(100),
-    @hPrice AS money
+    @hPrice AS decimal(19,2)
 )
 AS
 BEGIN
@@ -22,11 +22,11 @@ BEGIN
         END
         else
         BEGIN
-            THROW 50000, 'Failed to update record: invalid field/s',15
+            THROW 50001, 'Failed to update record: invalid field/s',15
         END
 END
 go
-exec sp_updateHaircut 1,'fade','tapered cut',24
+exec sp_updateHaircut 1001,'fade','tapered cut',24
 select * from Haircut
 
 drop proc if exists sp_updateProduct
@@ -35,7 +35,7 @@ CREATE PROC sp_updateProduct(
     @id AS int,
     @pName AS varchar(20),
     @pdesc AS varchar(100),
-    @pPrice AS money,
+    @pPrice AS decimal(19,2),
     @pQuantity AS int
 )
 AS
@@ -50,11 +50,11 @@ BEGIN
         END
         else
         BEGIN
-            THROW 50000, 'Failed to update record: invalid field/s',15
+            THROW 50001, 'Failed to update record: invalid field/s',2
         END
 END
 go
-exec sp_updateProduct 1,'comb','standard comb',45,31
+exec sp_updateProduct 2001,'comb','standard comb',45,31
 select * from Product
 
 drop proc if exists sp_updateCustomer
@@ -63,13 +63,13 @@ CREATE PROC sp_updateCustomer(
     @id AS int,
     @hID AS int,
     @cName AS varchar(20),
-    @cNum AS int,
+    @cNum AS varchar(10),
     @numOfVis AS int
 )
 AS
 BEGIN
     BEGIN TRAN
-        if(@id IN (SELECT Customer_ID FROM Customer) AND @cName!='' AND @numOfVis>0)
+        if(@id IN (SELECT Customer_ID FROM Customer) AND @cName!='' AND @numOfVis>0 AND (@cNum LIKE '081_______%' OR @cNum LIKE '085_______%'))
         BEGIN
             if(@hID>0 AND @hID IN (SELECT Haircut_ID FROM Haircut))
             BEGIN
@@ -88,11 +88,11 @@ BEGIN
         END
         else
         BEGIN
-            THROW 50000, 'Failed to update record: invalid field/s',15
+            THROW 50001, 'Failed to update record: invalid field/s',15
         END
 END
 go
-exec sp_updateCustomer 1, 1, 'john doe', 812111328, 5
+--exec sp_updateCustomer 300001, 1001, 'john doe', '0812111328', 20
 select * from Customer
 go
 */
