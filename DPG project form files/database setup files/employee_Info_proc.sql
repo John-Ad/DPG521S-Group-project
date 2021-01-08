@@ -1,7 +1,6 @@
 use DPGtestDb
 go
 
-/*
 DROP PROC IF EXISTS sp_GetEmpInfo
 go
 
@@ -42,7 +41,7 @@ BEGIN
             END
 
             SELECT @numOfEqp=(COUNT(Equipment_ID)), @totalEqVal=(SUM(Eqp_Value)) 
-            FROM Equipment WHERE Equipment_ID=@id
+            FROM Equipment WHERE Employee_ID=@id
             ---------------------
 
             --gets all the required information to complete the form
@@ -58,8 +57,6 @@ BEGIN
 END
 go
 
-exec sp_GetEmpInfo 1
-*/
 
 select * from Employee
 select * from Service_Rendered

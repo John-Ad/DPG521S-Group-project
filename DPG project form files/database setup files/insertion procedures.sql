@@ -2,19 +2,13 @@ use DPGtestDB
 go
 
 /*
-drop proc if exists sp_HaircutInsert
-delete Haircut
-dbcc checkident(Haircut,reseed,1)
-go
-*/
-
 --Haircut insert
-
-/*
+drop proc if exists sp_HaircutInsert
+go
 CREATE PROC sp_HaircutInsert(
     @hName AS varchar(20),
     @hDesc AS varchar(100),
-    @hPrice AS money
+    @hPrice AS decimal(19,2)
 )
 AS
 BEGIN
@@ -26,27 +20,25 @@ BEGIN
             END
         else
             BEGIN
-                PRINT @hName
-                PRINT 'Insertion into Haircut table failed';
-                ROLLBACK
+                THROW 50001, 'Invalid parameters provided', 2
             END
 END
+go
 
-
-exec sp_HaircutInsert 'fade','hair tapers off',30
-exec sp_HaircutInsert 'school','school cut',10
-exec sp_HaircutInsert 'mohawk','large spikes in center',200
-
-*/
+exec sp_HaircutInsert "fade","tapered cut",50.00
+exec sp_HaircutInsert "school cut","standard school cut",30.00
+exec sp_HaircutInsert "mohawk","bald with spiked center",100.00
+exec sp_HaircutInsert "bald","completely shaven head",20.00
+select * from Haircut
+go
 
 --Product insert
---drop proc if exists sp_ProdInsert
---go
-/*
+drop proc if exists sp_ProdInsert
+go
 CREATE PROC sp_ProdInsert(
     @pName AS varchar(20),
     @pDesc AS varchar(100),
-    @pPrice AS money,
+    @pPrice AS decimal(19,2),
     @pQuantity AS int
 )
 AS
@@ -59,31 +51,32 @@ BEGIN
             END
         else
             BEGIN
-                PRINT 'Insertion in Products table failed'
-                ROLLBACK
+                THROW 50001, 'Invalid parameters provided', 2
             END
 END
+go
 
-exec sp_ProdInsert 'jdf','sdfjh',11.11,12
+exec sp_ProdInsert "comb","standard comb",45.00,30
+exec sp_ProdInsert "brush","standard brush",65.00,22
+exec sp_ProdInsert "shaving cream","moisturizing shaving cream",55.00,12
+exec sp_ProdInsert "hair spray","non toxic hairspray",80.00,8
 select * from Product
-delete Product;
-dbcc checkident(Product,reseed,0)
-*/
+go
+
 
 --Customer insertion
-/*
 drop proc if exists sp_CustInsert
 go
 CREATE PROC sp_CustInsert(
     @hID AS int,
     @cName AS varchar(20),
-    @cCell AS int,
+    @cCell AS varchar(10),
     @cNumVisits AS int
 )
 AS
 BEGIN
     BEGIN TRAN
-        if(@cName != '' AND @cNumVisits >= 0)
+        if(@cName != '' AND @cNumVisits >= 0 AND (@cCell LIKE '081_______%' OR @cCell LIKE '085_______%'))
             BEGIN
                 if(@hID > 0 AND @hID IN (SELECT Haircut_ID FROM Haircut))
                     BEGIN
@@ -97,13 +90,20 @@ BEGIN
             END
         else
             BEGIN
-                PRINT 'insertion into customer table failed'
+                THROW 50001, 'Invalid parameters provided', 2
             END
 END
---exec sp_CustInsert NULL,'jim',0812111340,1
+go
+
+exec sp_CustInsert 1001,"john doe",'0812111328',4
+exec sp_CustInsert 1002,"jane doe",'0812111329',5
+exec sp_CustInsert 1003,"steve anderson",'0852111330',6
+exec sp_CustInsert 1004,"johannes paulus",'0852111331',7
+select * from Customer
+go
+
+
 --position insert function
-*/
-/*
 CREATE PROC sp_PosInsert(
     @pName AS varchar(20),
     @pDesc AS varchar(100)
@@ -118,38 +118,51 @@ BEGIN
             END
         else
             BEGIN
-                ROLLBACK
+                THROW 50001, 'Invalid parameters provided', 2
             END
 END
---exec sp_PosInsert 'manager',NULL
+go
+
+exec sp_PosInsert "cashier","handles transactions" 
+exec sp_PosInsert "manager","manages business" 
+exec sp_PosInsert "barber","cuts hair" 
+exec sp_PosInsert "cleaner","cleans business" 
+select * from Position
+go
+
 
 --Employee insert function
+drop proc if exists sp_EmpInsert
+go
 CREATE PROC sp_EmpInsert(
     @ePosID AS int,
     @eName AS varchar(20),
     @eAge AS int,
-    @eCell AS int 
+    @eCell AS varchar(10) 
 )
 AS
 BEGIN                       --test this before continueing
     BEGIN TRAN
-        if(@ePosID NOT IN(SELECT Position_ID FROM Position) OR @eName='' OR @eCell<810000000)
+        if(@ePosID NOT IN(SELECT Position_ID FROM Position) OR @eName='' OR (@eCell NOT LIKE '081_______%' AND @eCell NOT LIKE '085_______%'))
             BEGIN
-                PRINT 'Failed to insert into emp table'
-                ROLLBACK
+                THROW 50001, 'Invalid parameters provided', 2
             END
         else
             BEGIN
-                PRINT 'Succeeded in inserting into emp table'
                 INSERT INTO Employee VALUES(@ePosID,@eName,@eAge,@eCell)
                 COMMIT
             END
 END
 go
---exec sp_EmpInsert 1,'james',33,812111328
-*/
 
-/*
+exec sp_EmpInsert 1,"ashley adams",20,'0812408877'
+exec sp_EmpInsert 2,"david mutenga",30,'0812408878'
+exec sp_EmpInsert 3,"frank van wyk",24,'0852408879'
+exec sp_EmpInsert 4,"adrian van de merwe",43,'0852408880'
+select * from Employee
+go
+
+
 --equipment insert function
 drop proc if exists sp_EquipInsert
 go
@@ -157,14 +170,14 @@ CREATE PROC sp_EquipInsert(
     @eEmpID AS int,
     @eName AS varchar(20),
     @eDesc AS varchar(100),
-    @eValue AS money
+    @eValue AS decimal(19,2)
 )
 AS
 BEGIN
     BEGIN TRAN
         if(@eEmpID NOT IN(SELECT Employee_ID FROM Employee) OR @eName='' OR @eValue <= 0)
             BEGIN
-                PRINT 'FAILED'
+                THROW 50001, 'Invalid parameters provided', 2
             END
         else
             BEGIN
@@ -173,24 +186,30 @@ BEGIN
             END
 END
 go
-exec sp_EquipInsert 1,'razor','used for trimming',100
+
+select * from position
+select * from Employee
+exec sp_EquipInsert 3003,'Hair clippers','Used to cut hair',200.00
+exec sp_EquipInsert 3003,'Pack of razor blades','Used to trim hair',10.00
+select * from Equipment
 go
+
 
 --payroll insert function
 drop proc if exists sp_PayrollInsert
 go
 CREATE PROC sp_PayrollInsert(
     @empID AS INT,
-    @taxNum AS INT,
+    @taxNum AS varchar(8),
     @hrsWorked AS INT,
     @renumPerHr AS INT
 )
 AS
 BEGIN
     BEGIN TRAN
-        if(@empID NOT IN(SELECT Employee_ID FROM Employee) OR @taxNum<1 OR @hrsWorked<0 OR @renumPerHr<0)
+        if(@empID NOT IN(SELECT Employee_ID FROM Employee) OR (@taxNum NOT LIKE '0_______%') OR @hrsWorked<0 OR @renumPerHr<0)
             BEGIN
-                PRINT 'FAILED'
+                THROW 50001, 'Invalid parameters provided', 2
             END
         else 
             BEGIN
@@ -199,10 +218,15 @@ BEGIN
             END
 END
 go
-exec sp_PayrollInsert 1,2392482,22,33
-*/
 
-/*
+exec sp_PayrollInsert 3001,'01234567',10,20
+exec sp_PayrollInsert 3002,'01234568',28,50
+exec sp_PayrollInsert 3003,'01234569',40,30
+exec sp_PayrollInsert 3004,'01234570',18,10
+select * from Payroll
+go
+
+
 --Service_Rendered insert function
 drop proc if exists sp_ServRendInsert
 go
@@ -211,22 +235,21 @@ CREATE PROC sp_ServRendInsert(
     @custID AS INT,
     @hairID AS INT,
     @custName AS varchar(20),
-    @total AS money
+    @quantity AS int,
+    @total AS decimal(19,2)
 )
 AS
 BEGIN
     BEGIN TRAN
-    if(@empID NOT IN(SELECT Employee_ID FROM Employee) OR @custID NOT IN(SELECT Customer_ID FROM Customer) OR @hairID NOT IN(SELECT Haircut_ID FROM Haircut) OR @custName='' OR @total<0)
-        BEGIN
-            PRINT 'Failed to insert into ServiceRendered table'
-            ROLLBACK
-        END
-    else 
-        BEGIN 
-            PRINT 'Successfully inserted into ServiceRendered table'
-            INSERT INTO Service_Rendered VALUES(@empID,@custID,@hairID,@custName,@total,GETDATE())
-            COMMIT
-        END
+        if(@empID NOT IN(SELECT Employee_ID FROM Employee) OR @custID NOT IN(SELECT Customer_ID FROM Customer) OR @hairID NOT IN(SELECT Haircut_ID FROM Haircut) OR @custName='' OR @quantity<=0 OR @total<0)
+            BEGIN
+                THROW 50001, 'Invalid parameters provided', 2
+            END
+        else 
+            BEGIN 
+                INSERT INTO Service_Rendered VALUES(@empID,@custID,@hairID,@custName,@quantity,@total,GETDATE())
+                COMMIT
+            END
 END
 go
 
@@ -238,93 +261,28 @@ CREATE PROC sp_ProdSoldInsert(
     @custID AS INT,
     @prodID AS INT,
     @custName AS varchar(20),
-    @total AS money
+    @quantity AS int,
+    @total AS decimal(19,2)
 )
 AS
 BEGIN
     BEGIN TRAN
-    if(@empID NOT IN(SELECT Employee_ID FROM Employee) OR @custID NOT IN(SELECT Customer_ID FROM Customer) OR @prodID NOT IN(SELECT Product_ID FROM Product) OR @custName='' OR @total<0)
-        BEGIN
-            PRINT 'Failed to insert into ProductSold table'
-            ROLLBACK
-        END
-    else 
-        BEGIN 
-            PRINT 'Successfully inserted into ProductSold table'
-            INSERT INTO Product_Sold VALUES(@empID,@custID,@prodID,@custName,@total,GETDATE())
-            COMMIT
-        END
+        if(@empID NOT IN(SELECT Employee_ID FROM Employee) OR @custID NOT IN(SELECT Customer_ID FROM Customer) OR @prodID NOT IN(SELECT Product_ID FROM Product) OR @custName='' OR @quantity<=0 OR @total<0)
+            BEGIN
+                THROW 50001, 'Invalid parameters provided', 2
+            END
+        else 
+            BEGIN 
+                INSERT INTO Product_Sold VALUES(@empID,@custID,@prodID,@custName,@quantity,@total,GETDATE())
+                COMMIT
+            END
 END
 go
-delete from Product_Sold
-declare @n AS varchar(20)=(select Customer_Name from Customer where Customer_ID=2)
-exec sp_ProdSoldInsert 1,2,1,@n,100
-select * from Product_Sold
-declare @d AS DATE=GETDATE()
-print @d
-print @n
-
-*/
-
---insert data
-/*
-delete from Haircut
-dbcc checkident(Haircut,reseed,0)
-
-exec sp_HaircutInsert "fade","tapered cut",50.00
-exec sp_HaircutInsert "school cut","standard school cut",30.00
-exec sp_HaircutInsert "mohawk","bald with spiked center",100.00
-exec sp_HaircutInsert "bald","completely shaven head",20.00
-select * from Haircut
-
-delete from Product
-dbcc checkident(Product,reseed,0)
-
-exec sp_ProdInsert "comb","standard comb",45.00,30
-exec sp_ProdInsert "brush","standard brush",65.00,22
-exec sp_ProdInsert "shaving cream","moisturizing shaving cream",55.00,12
-exec sp_ProdInsert "hair spray","non toxic hairspray",80.00,8
-select * from Product
-
-delete from Customer
-dbcc checkident(Customer,reseed,0)
-
-exec sp_CustInsert 1,"john doe",812111328,4
-exec sp_CustInsert 2,"jane doe",812111329,4
-exec sp_CustInsert 3,"steve anderson",812111330,4
-exec sp_CustInsert 4,"johannes paulus",812111331,4
-select * from Customer
-
-delete from Position
-dbcc checkident(Position,reseed,0)
-
-exec sp_PosInsert "cashier","handles transactions" 
-exec sp_PosInsert "manager","manages business" 
-exec sp_PosInsert "barber","cuts hair" 
-exec sp_PosInsert "cleaner","cleans business" 
-select * from Position
-
-
-delete from Employee
-dbcc checkident(Employee,reseed,0)
-
-exec sp_EmpInsert 1,"ashley adams",20,812408877
-exec sp_EmpInsert 2,"david mutenga",30,812408878
-exec sp_EmpInsert 3,"frank van wyk",24,812408879
-exec sp_EmpInsert 4,"adrian van de merwe",43,812408880
-select * from Employee
 */
 
 /*
-delete from Product_Sold
 dbcc checkident(Product_Sold,reseed,0)
-delete from Service_Rendered
-dbcc checkident(Service_Rendered,reseed,0)
 */
-
-
-
-
 go
 
 
