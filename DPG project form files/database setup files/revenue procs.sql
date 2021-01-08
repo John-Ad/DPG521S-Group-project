@@ -1,9 +1,43 @@
 use DPGTestDB
 go
 
+--general proc for getting dates
+drop proc if exists sp_getDates
+go
+create proc sp_getDates(
+    @mode AS int=null,
+    @start AS date output,
+    @end AS date output
+)
+AS
+BEGIN
+    if(@mode=1)     --day
+    BEGIN
+        SET @start=GETDATE()
+        SET @end=@start
+    END
+    if(@mode=2)     --month
+    BEGIN
+        SET @start=DATEFROMPARTS(YEAR(GETDATE()),MONTH(GETDATE()),1)
+        SET @end=DATEFROMPARTS(YEAR(GETDATE()),MONTH(GETDATE()),DAY(EOMONTH(GETDATE())))
+    END
+    if(@mode=3)     --year
+    BEGIN
+        SET @start=DATEFROMPARTS(YEAR(GETDATE()),1,1)
+        SET @end=DATEFROMPARTS(YEAR(GETDATE()),12,31)
+    END
+    if(@mode>3 OR @mode<1)   
+    BEGIN
+        THROW 50001,'Invalid Parameters',18
+        RETURN
+    END
+END
+go
+----------------------------------
+
+--gets sales data for top 3 or specific items
 drop proc if exists sp_getBestSelling
 go
-
 CREATE PROC sp_getBestSelling(
     @mode AS int=NULL,
     @isProd AS bit=NULL,           --indicates whether haircut or product data is required
@@ -13,21 +47,11 @@ CREATE PROC sp_getBestSelling(
 )
 AS
 BEGIN
-    if(@mode=1)     --gets most popular haircuts/products for the current day
+    if(@mode>=1 AND @mode<=3)     -- 1=day, 2=month, 3=year
     BEGIN
-        SET @start=GETDATE()
-        SET @end=@start
+        EXEC sp_getDates @mode,@start OUTPUT,@end OUTPUT
     END
-    if(@mode=2)     --gets most popular haircuts/products for the current month
-    BEGIN
-        SET @start=DATEFROMPARTS(YEAR(GETDATE()),MONTH(GETDATE()),1)
-        SET @end=DATEFROMPARTS(YEAR(GETDATE()),MONTH(GETDATE()),DAY(EOMONTH(GETDATE())))
-    END
-    if(@mode=3)     --gets most popular haircuts/products for the current year
-    BEGIN
-        SET @start=DATEFROMPARTS(YEAR(GETDATE()),1,1)
-        SET @end=DATEFROMPARTS(YEAR(GETDATE()),12,31)
-    END
+
     if(@mode=4 AND (@start=NULL OR @end=NULL))   --gets most popular haircuts/products for a customer period of time
     BEGIN
         THROW 50001,'For a custom search the start and end date must be specified',18
@@ -82,8 +106,49 @@ BEGIN
     END
 END
 go
+-------------------------------------------------
 
-exec sp_getBestSelling 2,1
+--gets total sales based on a given time period
+drop proc if exists sp_GetTotalSales
+go
+CREATE PROC sp_GetTotalSales(
+    @mode AS int=2,
+    @start AS date=null,
+    @end AS date=null
+)
+AS
+BEGIN
+    if(@mode>=1 AND @mode<=3)     -- 1=day, 2=month, 3=year
+    BEGIN
+        EXEC sp_getDates @mode,@start OUTPUT,@end OUTPUT
+    END
+    if(@mode=4 AND (@start=NULL OR @end=NULL))   --gets most popular haircuts/products for a customer period of time
+    BEGIN
+        THROW 50001,'For a custom search the start and end date must be specified',18
+        RETURN
+    END
+    if(@mode>4)
+    BEGIN
+        THROW 50001, 'start date must be less than end date!',24
+        RETURN
+    END
+    if(@start>@end)
+    BEGIN
+        THROW 50001, 'start date must be less than end date!',24
+        RETURN
+    END
+
+    SELECT SUM(Total_Amount) AS Total_Sales FROM Service_Rendered
+    WHERE Service_Rendered.Date_of_Purchase>=@start AND Service_Rendered.Date_of_Purchase<=@end 
+    UNION
+    SELECT SUM(Total_Amount) FROM Product_Sold
+    WHERE Product_Sold.Date_of_Purchase>=@start AND Product_Sold.Date_of_Purchase<=@end 
+END
+go
+
+--exec sp_GetTotalSales
+--exec sp_getBestSelling 3,1
+--exec sp_GetBestSelling 4,0,'2020-01-01','2021-01-31',1001
 
 /*
 --start > end test
@@ -106,18 +171,7 @@ select @d
 */
 
 /*
-drop proc if exists sp_GetTotalSales
-go
-CREATE PROC sp_GetTotalSales
-AS
-BEGIN
-    SELECT SUM(Total_Amount) AS Total_Sales FROM Service_Rendered
-    UNION
-    SELECT SUM(Total_Amount) FROM Product_Sold
-END
-go
 
-exec sp_GetTotalSales
 */
 
 

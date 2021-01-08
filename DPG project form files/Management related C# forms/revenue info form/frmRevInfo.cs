@@ -17,6 +17,10 @@ namespace DPG_revenue_info_form
         SqlCommand cmd = null;
         SqlDataAdapter adapter = null;
         DataTable top3Table;
+        DataTable singleTable;
+        DataTable revGenTable;
+
+        String[] searchType = { "Single", "Top 3", "Total Revenue" };
 
         public frmRevInfo()
         {
@@ -30,12 +34,23 @@ namespace DPG_revenue_info_form
             connection.Open();
             //setup tables
             top3Table = new DataTable();
+            singleTable = new DataTable();
+            revGenTable = new DataTable();
+            //setup search type
+            cboSearchType.DataSource = searchType;
+            cboSearchType.SelectedIndex = 1;
             //set initial t3 values
             btnCurrM.PerformClick();
         }
 
         private bool executeQuery(String query, ref DataTable table)
         {
+            if (cboSearchType.SelectedIndex == -1)
+            {
+                MessageBox.Show("Please select a search type!", "Failed to execute query", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+
             if (cmd != null)
             {
                 cmd.Dispose();
@@ -145,45 +160,236 @@ namespace DPG_revenue_info_form
                 }
             }
         }
+        private void setSingleItem(ref DataTable table)
+        {
+            if (table.Rows.Count > 0)
+            {
+                txtSID.Text = table.Rows[0][0].ToString();
+                txtSName.Text = table.Rows[0][1].ToString();
+                txtSQuantity.Text = table.Rows[0][2].ToString();
+                txtSTotal.Text = table.Rows[0][3].ToString();
+            }
+            else
+            {
+                MessageBox.Show("This product/Haircut has not been sold within the given time period!");
+            }
+        }
+
+        private void setRevGen(ref DataTable table)
+        {
+            if (table.Rows.Count > 0)
+            {
+                txtRevHair.Text = table.Rows[0][0].ToString();
+                txtRevProd.Text = table.Rows[1][0].ToString();
+                txtRevTotal.Text = ((Decimal)table.Rows[0][0] + (Decimal)table.Rows[1][0]).ToString();
+            }
+            else
+            {
+                MessageBox.Show("There have been no sales during this time period!");
+            }
+        }
 
         private void btnCurrD_Click(object sender, EventArgs e)
         {
-            //get/set hair
-            executeQuery("exec sp_GetBestSelling 1,0", ref top3Table);
-            setTop3(ref top3Table, true);
-            //get/set prod
-            executeQuery("exec sp_GetBestSelling 1,1", ref top3Table);
-            setTop3(ref top3Table, false);
+            if (cboSearchType.SelectedIndex == 2)
+            {
+                if (executeQuery("exec sp_GetTotalSales 1", ref revGenTable))
+                    setRevGen(ref revGenTable);
+            }
+            if (cboSearchType.SelectedIndex == 1)
+            {
+                //get/set hair
+                if (executeQuery("exec sp_GetBestSelling 1,0", ref top3Table))
+                    setTop3(ref top3Table, true);
+                //get/set prod
+                if (executeQuery("exec sp_GetBestSelling 1,1", ref top3Table))
+                    setTop3(ref top3Table, false);
+            }
+            if (cboSearchType.SelectedIndex == 0)
+            {
+                if (rdoH.Checked)
+                {
+                    if (executeQuery("exec sp_SearchByName '" + txtNameSearch.Text + "',1", ref singleTable))
+                    {
+                        if (singleTable.Rows.Count > 0)
+                        {
+                            if (executeQuery("exec sp_GetBestSelling 1,0,null,null," + singleTable.Rows[0][0].ToString(), ref singleTable))
+                            {
+                                setSingleItem(ref singleTable);
+                            }
+                        }
+                    }
+                }
+                if (rdoP.Checked)
+                {
+                    if (executeQuery("exec sp_SearchByName '" + txtNameSearch.Text + "',2", ref singleTable))
+                    {
+                        if (singleTable.Rows.Count > 0)
+                        {
+                            if (executeQuery("exec sp_GetBestSelling 1,1,null,null," + singleTable.Rows[0][0].ToString(), ref singleTable))
+                            {
+                                setSingleItem(ref singleTable);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         private void btnCurrM_Click(object sender, EventArgs e)
         {
-            //get/set hair
-            executeQuery("exec sp_GetBestSelling 2,0", ref top3Table);
-            setTop3(ref top3Table, true);
-            //get/set prod
-            executeQuery("exec sp_GetBestSelling 2,1", ref top3Table);
-            setTop3(ref top3Table, false);
+            if (cboSearchType.SelectedIndex == 2)
+            {
+                if (executeQuery("exec sp_GetTotalSales 2", ref revGenTable))
+                    setRevGen(ref revGenTable);
+            }
+            if (cboSearchType.SelectedIndex == 1)
+            {
+                //get/set hair
+                if (executeQuery("exec sp_GetBestSelling 2,0", ref top3Table))
+                    setTop3(ref top3Table, true);
+                //get/set prod
+                if (executeQuery("exec sp_GetBestSelling 2,1", ref top3Table))
+                    setTop3(ref top3Table, false);
+            }
+            if (cboSearchType.SelectedIndex == 0)
+            {
+                if (rdoH.Checked)
+                {
+                    if (executeQuery("exec sp_SearchByName '" + txtNameSearch.Text + "',1", ref singleTable))
+                    {
+                        if (singleTable.Rows.Count > 0)
+                        {
+                            if (executeQuery("exec sp_GetBestSelling 2,0,null,null," + singleTable.Rows[0][0].ToString(), ref singleTable))
+                            {
+                                setSingleItem(ref singleTable);
+                            }
+                        }
+                    }
+                }
+                if (rdoP.Checked)
+                {
+                    if (executeQuery("exec sp_SearchByName '" + txtNameSearch.Text + "',2", ref singleTable))
+                    {
+                        if (singleTable.Rows.Count > 0)
+                        {
+                            if (executeQuery("exec sp_GetBestSelling 2,1,null,null," + singleTable.Rows[0][0].ToString(), ref singleTable))
+                            {
+                                setSingleItem(ref singleTable);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         private void btnCurrY_Click(object sender, EventArgs e)
         {
-            //get/set hair
-            executeQuery("exec sp_GetBestSelling 3,0", ref top3Table);
-            setTop3(ref top3Table, true);
-            //get/set prod
-            executeQuery("exec sp_GetBestSelling 3,1", ref top3Table);
-            setTop3(ref top3Table, false);
+            if (cboSearchType.SelectedIndex == 2)
+            {
+                if (executeQuery("exec sp_GetTotalSales 3", ref revGenTable))
+                    setRevGen(ref revGenTable);
+            }
+            if (cboSearchType.SelectedIndex == 1)
+            {
+                //get/set hair
+                if (executeQuery("exec sp_GetBestSelling 3,0", ref top3Table))
+                    setTop3(ref top3Table, true);
+                //get/set prod
+                if (executeQuery("exec sp_GetBestSelling 3,1", ref top3Table))
+                    setTop3(ref top3Table, false);
+            }
+            if (cboSearchType.SelectedIndex == 0)
+            {
+                if (rdoH.Checked)
+                {
+                    if (executeQuery("exec sp_SearchByName '" + txtNameSearch.Text + "',1", ref singleTable))
+                    {
+                        if (singleTable.Rows.Count > 0)
+                        {
+                            if (executeQuery("exec sp_GetBestSelling 3,0,null,null," + singleTable.Rows[0][0].ToString(), ref singleTable))
+                            {
+                                setSingleItem(ref singleTable);
+                            }
+                        }
+                    }
+                }
+                if (rdoP.Checked)
+                {
+                    if (executeQuery("exec sp_SearchByName '" + txtNameSearch.Text + "',2", ref singleTable))
+                    {
+                        if (singleTable.Rows.Count > 0)
+                        {
+                            if (executeQuery("exec sp_GetBestSelling 3,1,null,null," + singleTable.Rows[0][0].ToString(), ref singleTable))
+                            {
+                                setSingleItem(ref singleTable);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         private void btnSearch_Click(object sender, EventArgs e)
         {
-            //get/set hair
-            executeQuery("exec sp_GetBestSelling 4,0,'" + txtStartD.Text + "','" + txtEndD.Text + "'", ref top3Table);
-            setTop3(ref top3Table, true);
-            //get/set prod
-            executeQuery("exec sp_GetBestSelling 4,1,'" + txtStartD.Text + "','" + txtEndD.Text + "'", ref top3Table);
-            setTop3(ref top3Table, false);
+            if (cboSearchType.SelectedIndex == 2)
+            {
+                if (executeQuery("exec sp_GetTotalSales 4,'" + txtStartD.Text + "','" + txtEndD.Text + "'", ref revGenTable))
+                    setRevGen(ref revGenTable);
+            }
+            if (cboSearchType.SelectedIndex == 1)
+            {
+                //get/set hair
+                if (executeQuery("exec sp_GetBestSelling 4,0,'" + txtStartD.Text + "','" + txtEndD.Text + "'", ref top3Table))
+                    setTop3(ref top3Table, true);
+                //get/set prod
+                if (executeQuery("exec sp_GetBestSelling 4,1,'" + txtStartD.Text + "','" + txtEndD.Text + "'", ref top3Table))
+                    setTop3(ref top3Table, false);
+            }
+            if (cboSearchType.SelectedIndex == 0)
+            {
+                if (rdoH.Checked)
+                {
+                    if (executeQuery("exec sp_SearchByName '" + txtNameSearch.Text + "',1", ref singleTable))
+                    {
+                        if (singleTable.Rows.Count > 0)
+                        {
+                            if (executeQuery("exec sp_GetBestSelling 4,0,'" + txtStartD.Text + "','" + txtEndD.Text + "'," + singleTable.Rows[0][0].ToString(), ref singleTable))
+                            {
+                                setSingleItem(ref singleTable);
+                            }
+                        }
+                    }
+                }
+                if (rdoP.Checked)
+                {
+                    if (executeQuery("exec sp_SearchByName '" + txtNameSearch.Text + "',2", ref singleTable))
+                    {
+                        if (singleTable.Rows.Count > 0)
+                        {
+                            if (executeQuery("exec sp_GetBestSelling 4,1,'" + txtStartD.Text + "','" + txtEndD.Text + "'," + singleTable.Rows[0][0].ToString(), ref singleTable))
+                            {
+                                setSingleItem(ref singleTable);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void cboSearchType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void rdoP_CheckedChanged(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void rdoH_CheckedChanged(object sender, EventArgs e)
+        {
+            
         }
     }
 }
