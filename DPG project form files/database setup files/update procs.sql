@@ -96,3 +96,38 @@ go
 select * from Customer
 go
 */
+
+drop proc if exists sp_updateEmployee
+go
+CREATE PROC sp_updateEmployee(
+    @id AS int=null,
+    @posID AS int=null,
+    @name AS varchar(20)=null,
+    @age AS int,
+    @cNum AS varchar(10)=null
+)
+AS
+BEGIN
+    if(@id IN(SELECT Employee_ID FROM Employee) AND @posID IN(SELECT Position_ID FROM Position) AND (@name is not null AND @name!='') AND (@cNum LIKE '081_______%' OR @cNum LIKE '085_______%'))
+    BEGIN
+        UPDATE Employee 
+        SET Position_ID=@posID,Employee_Name=@name,Age=@age,Cell_Number=@cNum
+        WHERE Employee_ID=@id
+    END
+    else
+    BEGIN
+        THROW 50001, 'Failed to update record: invalid field/s',15
+    END
+END
+
+
+
+
+
+
+
+
+
+
+
+
