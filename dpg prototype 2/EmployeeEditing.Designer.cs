@@ -45,6 +45,7 @@
             this.txtID = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.panel3 = new System.Windows.Forms.Panel();
+            this.btnLogDets = new System.Windows.Forms.Button();
             this.btnEdit = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnFirst = new System.Windows.Forms.Button();
@@ -273,6 +274,7 @@
             // panel3
             // 
             this.panel3.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
+            this.panel3.Controls.Add(this.btnLogDets);
             this.panel3.Controls.Add(this.btnEdit);
             this.panel3.Controls.Add(this.btnCancel);
             this.panel3.Controls.Add(this.btnFirst);
@@ -283,6 +285,18 @@
             this.panel3.Name = "panel3";
             this.panel3.Size = new System.Drawing.Size(136, 174);
             this.panel3.TabIndex = 0;
+            // 
+            // btnLogDets
+            // 
+            this.btnLogDets.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnLogDets.BackColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.btnLogDets.Location = new System.Drawing.Point(0, 151);
+            this.btnLogDets.Name = "btnLogDets";
+            this.btnLogDets.Size = new System.Drawing.Size(136, 23);
+            this.btnLogDets.TabIndex = 0;
+            this.btnLogDets.Text = "Manage Login details";
+            this.btnLogDets.UseVisualStyleBackColor = false;
+            this.btnLogDets.Click += new System.EventHandler(this.btnLogDets_Click);
             // 
             // btnEdit
             // 
@@ -585,6 +599,7 @@
         private System.Windows.Forms.Button btnSave;
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.TextBox txtPosID;
+        private System.Windows.Forms.Button btnLogDets;
     }
 }
 

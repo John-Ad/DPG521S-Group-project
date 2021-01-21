@@ -44,7 +44,7 @@ namespace DPG_prototype_v2
         {
             InitializeComponent();
             this.dbM = dbM;
-            this.Scale((Screen.PrimaryScreen.Bounds.Width / this.Width), (Screen.PrimaryScreen.Bounds.Height / this.Height));
+            this.Scale(((float)Screen.PrimaryScreen.Bounds.Width / this.Width), ((float)Screen.PrimaryScreen.Bounds.Height / this.Height));
             this.WindowState = FormWindowState.Maximized;
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             this.MinimizeBox = false;
@@ -318,6 +318,13 @@ namespace DPG_prototype_v2
         private void btnDone_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void btnLogDets_Click(object sender, EventArgs e)
+        {
+            frmLoginMng loginMng = new frmLoginMng(int.Parse(txtID.Text), ref dbM);
+            loginMng.ShowDialog();
+            loginMng.Dispose();
         }
     }
 }

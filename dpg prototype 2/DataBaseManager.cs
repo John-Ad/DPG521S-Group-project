@@ -30,7 +30,9 @@ namespace DPG_prototype_v2
                 if (cmd.ExecuteNonQuery() > 0)
                     return true;
                 else
+                {
                     return false;
+                }
             }
             catch(SqlException ex)
             {

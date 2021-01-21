@@ -1,4 +1,4 @@
-DROP DATABASE IF EXISTS DPGtestDBv2
+DROP DATABASE IF EXISTS DPGtestDBv2;
 go
 
 CREATE DATABASE DPGtestDBv2;
@@ -42,6 +42,14 @@ CREATE TABLE Employee(
     Cell_Number varchar(10) NOT NULL,
     FOREIGN KEY (Position_ID) REFERENCES Position (Position_ID)
 );
+CREATE TABLE loginpage(
+    Employee_ID int NOT NULL,   
+	constraint PK_T2 primary key (Employee_ID),
+	FOREIGN KEY (Employee_ID) REFERENCES Employee (Employee_ID),
+	login_username varchar(20) NOT NULL, 
+    Login_password varchar(20) NOT Null, 
+);
+go
 CREATE TABLE Equipment(
     Equipment_ID int PRIMARY KEY IDENTITY(4001,1),  --all equipment ids are > 4000 and < 5000
     Employee_ID int NOT NULL,
@@ -83,6 +91,13 @@ CREATE TABLE Product_Sold(
     FOREIGN KEY (Employee_ID) REFERENCES Employee (Employee_ID),
     FOREIGN KEY (Customer_ID) REFERENCES Customer (Customer_ID),
     FOREIGN KEY (Product_ID) REFERENCES Product (Product_ID)
+);
+CREATE TABLE Profit_Loss_Data(
+    _Year smallint NOT NULL,
+    _Month smallint NOT NULL,
+    Expenses decimal(19,2) NOT NULL,
+    _Target decimal(19,2) NOT NULL
+    CONSTRAINT PK_date PRIMARY KEY NONCLUSTERED(_Year,_Month)
 );
 go
 --//////////////////////////////////////////////////////////////////////////////////////////////
@@ -248,7 +263,31 @@ exec sp_EmpInsert 2,"david mutenga",30,'0812408878'
 exec sp_EmpInsert 3,"frank van wyk",24,'0852408879'
 exec sp_EmpInsert 4,"adrian van de merwe",43,'0852408880'
 go
+--login insert function
+drop proc if exists sp_LogInsert
+go
+CREATE PROC sp_LogInsert(
+    @EmpID AS int,
+    @lUsername AS varchar(20),
+    @lpassword AS varchar(20)
+)
+AS
+BEGIN                      
+    BEGIN TRAN
+        if(@EmpID NOT IN(SELECT Employee_ID FROM Employee) OR @lpassword NOT LIKE '________%' OR @lUsername=' ' )       -- '________%' means that there must be atleast 8 characters
+            BEGIN
+                THROW 50001, 'Invalid parameters provided', 2
+            END
+        else
+            BEGIN
+                INSERT INTO loginpage VALUES(@EmpID, @lUsername,@lpassword)
+                COMMIT
+            END
+END
+go
 
+exec sp_LogInsert 3002,'david','12345678'
+go
 
 --equipment insert function
 drop proc if exists sp_EquipInsert
@@ -364,6 +403,30 @@ BEGIN
             END
 END
 go
+
+    --prof/lossData insert
+drop proc if exists sp_ProfLossInsert
+go
+CREATE PROC sp_ProfLossInsert(
+    @expens AS decimal(19,2),
+    @trgt AS decimal(19,2)
+)
+AS
+BEGIN
+    DECLARE @year AS smallint,@month AS smallint,@recCount AS int
+    SET @year=CAST(YEAR(GETDATE()) AS smallint)
+    SET @month=CAST(MONTH(GETDATE()) AS smallint)
+    SET @recCount=(SELECT COUNT(*) FROM Profit_Loss_Data WHERE _Year=@year AND _Month=@month)
+    if(@expens>=0 AND @trgt>=0 AND @recCount=0)
+    BEGIN
+        INSERT INTO Profit_Loss_Data VALUES (@year,@month,@expens,@trgt)
+    END
+    else 
+    BEGIN
+        THROW 50001,'Invalid parameters!',4
+    END
+END
+go
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -423,6 +486,30 @@ BEGIN
         else
         BEGIN
             THROW 50001, 'Failed to update record: invalid field/s',15
+        END
+END
+go
+--update login procedure
+drop proc if exists sp_updatelogin
+go
+CREATE PROC sp_updatelogin(
+    @EmpID AS int,
+    @lUsername AS varchar(20),
+    @lpassword AS varchar(20)
+)
+AS
+BEGIN
+    BEGIN TRAN
+        if(@EmpID NOT IN(SELECT Employee_ID FROM Employee) OR @lpassword NOT LIKE '________%' OR @lUsername=' ' )   --these checks, if true, mean the parameters are invalid
+        BEGIN
+            THROW 50001, 'Failed to update record: invalid field/s',15
+        END
+        else
+        BEGIN
+            UPDATE loginpage
+            SET Employee_ID=@EmpID,login_username=@lUsername, Login_password=@lpassword
+            WHERE Employee_ID=@EmpID
+            COMMIT
         END
 END
 go
@@ -556,6 +643,31 @@ BEGIN
     BEGIN
         THROW 50001, 'Failed to update record: invalid field/s',15
     END
+END
+go
+
+drop proc if exists sp_updateProfLoss
+go
+CREATE PROC sp_updateProfLoss(
+    @expenses AS decimal(19,2),
+    @target AS decimal(19,2)
+)
+AS
+BEGIN
+    DECLARE @year AS smallint,@month AS smallint,@recCount AS int
+    SET @year=CAST(YEAR(GETDATE()) AS smallint)
+    SET @month=CAST(MONTH(GETDATE()) AS smallint)
+
+    SET @recCount=(SELECT COUNT(*) FROM Profit_Loss_Data WHERE _Year=@year AND _Month=@month)
+    if(@recCount=0)
+    BEGIN
+        THROW 50002,'No record for this month exists! Add a new record',6
+        RETURN
+    END
+
+    UPDATE Profit_Loss_Data
+    SET Expenses=@expenses,_Target=@target
+    WHERE _Year=@year AND _Month=@month
 END
 go
 --///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -840,6 +952,77 @@ go
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+--Triggers and procedures used by those triggers
+drop trigger if exists trg_stockUpdate
+go
+CREATE TRIGGER trg_stockUpdate
+ON Product_Sold
+AFTER INSERT
+AS
+BEGIN
+    DECLARE @pID AS int=(SELECT Product_ID FROM inserted)
+    DECLARE @pQty AS int=(SELECT Quantity FROM inserted)
+
+    UPDATE Product
+    SET Quantity=(Quantity-@pQty)
+    WHERE Product_ID=@pID
+END
+go
+
+drop proc if exists sp_updateNumOfVisits
+go
+CREATE PROC sp_updateNumOfVisits(       --since there are 2 tables that record transactions, this function will be shared between the 2 triggers for those tables avoiding the duplication of code
+    @id AS int
+)
+AS
+BEGIN
+    DECLARE @visCount AS int=(  SELECT SUM(visits)      --counts the number of transactions in a current day
+                                FROM (
+                                    SELECT COUNT(*) AS visits FROM Product_Sold
+                                    WHERE Date_of_Purchase=CAST(GETDATE() AS date) AND Customer_ID=@id
+                                    UNION
+                                    SELECT COUNT(*) FROM Service_Rendered
+                                    WHERE Date_of_Purchase=CAST(GETDATE() AS date) AND Customer_ID=@id
+                                ) t)
+    if(@visCount=1)     --if the number of transactions are 1 (the current one that was just inserted) then the num_of_visits column is increased by 1
+    BEGIN
+        UPDATE Customer
+        SET Num_of_Visits=(Num_of_Visits+1)
+        WHERE Customer_ID=@id
+    END
+END
+go
+
+drop trigger if exists trg_hVisitedUpdate   --trigger for servRend
+go
+CREATE TRIGGER trg_hVisitedUpdate
+ON Service_Rendered
+AFTER INSERT
+AS
+BEGIN
+    DECLARE @cID AS int=(SELECT Customer_ID FROM inserted)
+    exec sp_updateNumOfVisits @cID
+END
+go
+
+drop trigger if exists trg_pVisitedUpdate   --trigger for prodSold
+go
+CREATE TRIGGER trg_pVisitedUpdate
+ON Product_Sold
+AFTER INSERT
+AS
+BEGIN
+    DECLARE @cID AS int=(SELECT Customer_ID FROM inserted)
+    exec sp_updateNumOfVisits @cID
+END
+go
+--//////////////////////////////////////////////////////////////////////////////////////////////////////////
+--//////////////////////////////////////////////////////////////////////////////////////////////////////////
+--//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
 
 
