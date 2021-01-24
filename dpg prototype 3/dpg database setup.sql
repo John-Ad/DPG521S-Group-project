@@ -100,7 +100,8 @@ CREATE TABLE Profit_Loss_Data(
     _Year smallint NOT NULL,
     _Month smallint NOT NULL,
     Expenses decimal(19,2) NOT NULL,
-    _Target decimal(19,2) NOT NULL
+    _Target decimal(19,2) NOT NULL,
+    Profit decimal(19,2) NOT NULL
     CONSTRAINT PK_date PRIMARY KEY NONCLUSTERED(_Year,_Month)
 );
 go
@@ -441,13 +442,18 @@ BEGIN
     SET @recCount=(SELECT COUNT(*) FROM Profit_Loss_Data WHERE _Year=@year AND _Month=@month)
     if(@expens>=0 AND @trgt>=0 AND @recCount=0)
     BEGIN
-        INSERT INTO Profit_Loss_Data VALUES (@year,@month,@expens,@trgt)
+        INSERT INTO Profit_Loss_Data VALUES (@year,@month,@expens,@trgt,(0-(@expens+@trgt)))
     END
     else 
     BEGIN
         THROW 50001,'Invalid parameters!',4
     END
 END
+go
+
+--example data
+insert into Profit_Loss_Data values(2020,01,100,300,400)
+insert into Profit_Loss_Data values(2021,01,100,300,-400)
 go
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -671,14 +677,20 @@ go
 drop proc if exists sp_updateProfLoss
 go
 CREATE PROC sp_updateProfLoss(
-    @expenses AS decimal(19,2),
-    @target AS decimal(19,2)
+    @expenses AS decimal(19,2)=NULL,
+    @target AS decimal(19,2)=NULL,
+    @prof AS decimal(19,2)=NULL
 )
 AS
 BEGIN
     DECLARE @year AS smallint,@month AS smallint,@recCount AS int
     SET @year=CAST(YEAR(GETDATE()) AS smallint)
     SET @month=CAST(MONTH(GETDATE()) AS smallint)
+
+    if(@expenses IS NULL AND @target IS NULL AND @prof IS NOT NULL)
+    BEGIN
+        SELECT @expenses=Expenses,@target=_Target,@prof=(Profit+@prof) FROM Profit_Loss_Data WHERE _Year=@year AND _Month=@month
+    END
 
     SET @recCount=(SELECT COUNT(*) FROM Profit_Loss_Data WHERE _Year=@year AND _Month=@month)
     if(@recCount=0)
@@ -688,7 +700,7 @@ BEGIN
     END
 
     UPDATE Profit_Loss_Data
-    SET Expenses=@expenses,_Target=@target
+    SET Expenses=@expenses,_Target=@target,Profit=@prof
     WHERE _Year=@year AND _Month=@month
 END
 go
@@ -775,7 +787,7 @@ BEGIN
             --gets all the required information to complete the form
             SELECT  Employee.Employee_ID,Employee.Employee_Name,Employee.Age,Employee.Cell_Number,
 		            Position.Position_Name, Position.Position_Desc,
-		            Payroll.Tax_Number, Payroll.Hrs_Worked_Month, Payroll.Renum_Per_Hr,
+		            Payroll.Tax_Number, Payroll.Hrs_Worked_Month, Payroll.Renum_Per_Hr,CAST((Payroll.Hrs_Worked_Month*Payroll.Renum_Per_Hr) AS decimal(19,2)) AS Current_Wages,
                     @numOfTrans AS Num_of_trans,@totalRev AS total_revenue, @mostHelpedCus AS most_helped_cus,
                     @numOfEqp AS num_of_equip,@totalEqVal AS total_eqp_value
             FROM  (Employee INNER JOIN Position ON Position.Position_ID=Employee.Position_ID)
@@ -784,6 +796,27 @@ BEGIN
         END
 END
 go
+--//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+--//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+--//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+--gets profit loss info for all records in the prof/loss table
+drop proc if exists sp_getProfLossInfo
+go
+CREATE PROC sp_getProfLossInfo
+AS
+BEGIN
+    SELECT t.Expenses,t._Target,t.Profit,CASE
+                                        WHEN (SELECT COUNT(*) FROM Profit_Loss_Data WHERE _Year=t._Year-1 AND _Month=t._Month)!=0
+                                        THEN (SELECT (t.Profit-Profit) FROM Profit_Loss_Data WHERE _Year=t._Year-1 AND _Month=t._Month)
+                                        ELSE -9999999.99    --indicates that there is no record for the previous year for this month
+                                    END
+    FROM Profit_Loss_Data AS t
+END
+go
+
+
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1027,6 +1060,7 @@ BEGIN
 END
 go
 
+--update num of visits
 drop trigger if exists trg_updateNumOfVisits
 go
 CREATE TRIGGER trg_updateNumOfVisits
@@ -1041,6 +1075,35 @@ BEGIN
     WHERE Customer_ID=@id
 END
 go
+
+drop trigger if exists trg_updateProfLoss
+go
+CREATE TRIGGER trg_updateProfLoss
+ON Transaction_Performed
+AFTER INSERT 
+AS
+BEGIN
+    DECLARE @tot AS decimal(19,2)=(SELECT Total FROM inserted)
+    EXEC sp_updateProfLoss NULL,NULL,@tot
+END
+go
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
