@@ -233,6 +233,7 @@ go
 --example data      --can be changed
 exec sp_PosInsert "cashier","handles transactions" 
 exec sp_PosInsert "manager","manages business" 
+exec sp_PosInsert "hr manager","handles human resources"
 exec sp_PosInsert "barber","cuts hair" 
 exec sp_PosInsert "cleaner","cleans business" 
 go
@@ -265,8 +266,9 @@ go
 --example data      --can be changed
 exec sp_EmpInsert 1,"ashley adams",20,'0812408877'
 exec sp_EmpInsert 2,"david mutenga",30,'0812408878'
-exec sp_EmpInsert 3,"frank van wyk",24,'0852408879'
-exec sp_EmpInsert 4,"adrian van de merwe",43,'0852408880'
+exec sp_EmpInsert 3,"jeffery jefferson",40,'0812408890'
+exec sp_EmpInsert 4,"frank van wyk",24,'0852408879'
+exec sp_EmpInsert 5,"adrian van de merwe",43,'0852408880'
 go
 --login insert function
 drop proc if exists sp_LogInsert
@@ -291,7 +293,7 @@ BEGIN
 END
 go
 
-exec sp_LogInsert 3002,'david','12345678'
+exec sp_LogInsert 3003,'jeff','12345678'
 go
 
 --equipment insert function
@@ -319,8 +321,8 @@ END
 go
 
 --example data      --can be changed
-exec sp_EquipInsert 3003,'Hair clippers','Used to cut hair',200.00
-exec sp_EquipInsert 3003,'Pack of razor blades','Used to trim hair',10.00
+exec sp_EquipInsert 3004,'Hair clippers','Used to cut hair',200.00
+exec sp_EquipInsert 3004,'Pack of razor blades','Used to trim hair',10.00
 go
 
 
@@ -350,8 +352,8 @@ go
 
 exec sp_PayrollInsert 3001,'01234567',10,20
 exec sp_PayrollInsert 3002,'01234568',28,50
-exec sp_PayrollInsert 3003,'01234569',40,30
-exec sp_PayrollInsert 3004,'01234570',18,10
+exec sp_PayrollInsert 3004,'01234569',40,30
+exec sp_PayrollInsert 3005,'01234570',18,10
 go
 
 
@@ -442,18 +444,21 @@ BEGIN
     SET @recCount=(SELECT COUNT(*) FROM Profit_Loss_Data WHERE _Year=@year AND _Month=@month)
     if(@expens>=0 AND @trgt>=0 AND @recCount=0)
     BEGIN
-        INSERT INTO Profit_Loss_Data VALUES (@year,@month,@expens,@trgt,(0-(@expens+@trgt)))
+        INSERT INTO Profit_Loss_Data VALUES (@year,@month,@expens,@trgt,(0-(@expens)))
     END
     else 
     BEGIN
-        THROW 50001,'Invalid parameters!',4
+        if(@recCount>0)
+            THROW 50001,'A record for the current month already exists!',4
+        else
+            THROW 50001,'Invalid parameters!',4
     END
 END
 go
 
 --example data
 insert into Profit_Loss_Data values(2020,01,100,300,400)
-insert into Profit_Loss_Data values(2021,01,100,300,-400)
+--insert into Profit_Loss_Data values(2021,01,100,300,-100)
 go
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 --//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -679,7 +684,7 @@ go
 CREATE PROC sp_updateProfLoss(
     @expenses AS decimal(19,2)=NULL,
     @target AS decimal(19,2)=NULL,
-    @prof AS decimal(19,2)=NULL
+    @prof AS decimal(19,2)=0
 )
 AS
 BEGIN
@@ -687,15 +692,19 @@ BEGIN
     SET @year=CAST(YEAR(GETDATE()) AS smallint)
     SET @month=CAST(MONTH(GETDATE()) AS smallint)
 
-    if(@expenses IS NULL AND @target IS NULL AND @prof IS NOT NULL)
+    if(@expenses IS NULL AND @target IS NULL)
     BEGIN
         SELECT @expenses=Expenses,@target=_Target,@prof=(Profit+@prof) FROM Profit_Loss_Data WHERE _Year=@year AND _Month=@month
+    END
+    else
+    BEGIN
+        SELECT @prof=((0-@expenses)+(Profit+Expenses)) FROM Profit_Loss_Data WHERE _Year=@year AND _Month=@month
     END
 
     SET @recCount=(SELECT COUNT(*) FROM Profit_Loss_Data WHERE _Year=@year AND _Month=@month)
     if(@recCount=0)
     BEGIN
-        THROW 50002,'No record for this month exists! Add a new record',6
+        THROW 50002,'Cannot edit records other than the one for the current month!',6
         RETURN
     END
 
@@ -807,11 +816,11 @@ go
 CREATE PROC sp_getProfLossInfo
 AS
 BEGIN
-    SELECT t.Expenses,t._Target,t.Profit,CASE
+    SELECT CAST(t._Year AS varchar)+'/'+CAST(t._Month AS varchar) AS _Date,t.Expenses,t._Target,t.Profit,CASE
                                         WHEN (SELECT COUNT(*) FROM Profit_Loss_Data WHERE _Year=t._Year-1 AND _Month=t._Month)!=0
                                         THEN (SELECT (t.Profit-Profit) FROM Profit_Loss_Data WHERE _Year=t._Year-1 AND _Month=t._Month)
                                         ELSE -9999999.99    --indicates that there is no record for the previous year for this month
-                                    END
+                                    END AS Compare
     FROM Profit_Loss_Data AS t
 END
 go

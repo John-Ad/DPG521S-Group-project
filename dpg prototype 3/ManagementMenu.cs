@@ -35,6 +35,13 @@ namespace DPG_prototype_v2
             revInfo.Dispose();
         }
 
+        private void btnProfLoss_Click(object sender, EventArgs e)
+        {
+            frmProfLoss profLoss = new frmProfLoss(ref dbM);
+            profLoss.ShowDialog();
+            profLoss.Dispose();
+        }
+
         private void btnCustEdit_Click(object sender, EventArgs e)
         {
             frmCustLookupEdit custLookupEdit = new frmCustLookupEdit(ref dbM);

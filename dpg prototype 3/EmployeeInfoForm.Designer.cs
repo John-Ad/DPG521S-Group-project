@@ -72,6 +72,8 @@
             this.txtRenumPerHr = new System.Windows.Forms.TextBox();
             this.txtHrsWrked = new System.Windows.Forms.TextBox();
             this.txtTaxNum = new System.Windows.Forms.TextBox();
+            this.label19 = new System.Windows.Forms.Label();
+            this.txtCurrWage = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -507,6 +509,7 @@
             // panel5
             // 
             this.panel5.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
+            this.panel5.Controls.Add(this.label19);
             this.panel5.Controls.Add(this.label14);
             this.panel5.Controls.Add(this.label13);
             this.panel5.Controls.Add(this.label12);
@@ -522,7 +525,7 @@
             this.label14.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.label14.BackColor = System.Drawing.Color.White;
             this.label14.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.label14.Location = new System.Drawing.Point(0, 130);
+            this.label14.Location = new System.Drawing.Point(0, 109);
             this.label14.Name = "label14";
             this.label14.Size = new System.Drawing.Size(240, 28);
             this.label14.TabIndex = 0;
@@ -534,7 +537,7 @@
             this.label13.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.label13.BackColor = System.Drawing.Color.White;
             this.label13.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.label13.Location = new System.Drawing.Point(0, 91);
+            this.label13.Location = new System.Drawing.Point(0, 78);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(240, 28);
             this.label13.TabIndex = 0;
@@ -546,7 +549,7 @@
             this.label12.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.label12.BackColor = System.Drawing.Color.White;
             this.label12.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.label12.Location = new System.Drawing.Point(0, 50);
+            this.label12.Location = new System.Drawing.Point(0, 48);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(240, 28);
             this.label12.TabIndex = 0;
@@ -568,6 +571,7 @@
             // panel6
             // 
             this.panel6.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
+            this.panel6.Controls.Add(this.txtCurrWage);
             this.panel6.Controls.Add(this.btnBack);
             this.panel6.Controls.Add(this.txtRenumPerHr);
             this.panel6.Controls.Add(this.txtHrsWrked);
@@ -581,9 +585,9 @@
             // btnBack
             // 
             this.btnBack.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnBack.Location = new System.Drawing.Point(0, 164);
+            this.btnBack.Location = new System.Drawing.Point(0, 173);
             this.btnBack.Name = "btnBack";
-            this.btnBack.Size = new System.Drawing.Size(240, 33);
+            this.btnBack.Size = new System.Drawing.Size(240, 24);
             this.btnBack.TabIndex = 1;
             this.btnBack.Text = "Back";
             this.btnBack.UseVisualStyleBackColor = true;
@@ -594,7 +598,7 @@
             this.txtRenumPerHr.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.txtRenumPerHr.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtRenumPerHr.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.txtRenumPerHr.Location = new System.Drawing.Point(0, 131);
+            this.txtRenumPerHr.Location = new System.Drawing.Point(0, 109);
             this.txtRenumPerHr.Multiline = true;
             this.txtRenumPerHr.Name = "txtRenumPerHr";
             this.txtRenumPerHr.Size = new System.Drawing.Size(240, 27);
@@ -605,7 +609,7 @@
             this.txtHrsWrked.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.txtHrsWrked.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtHrsWrked.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.txtHrsWrked.Location = new System.Drawing.Point(0, 92);
+            this.txtHrsWrked.Location = new System.Drawing.Point(0, 78);
             this.txtHrsWrked.Multiline = true;
             this.txtHrsWrked.Name = "txtHrsWrked";
             this.txtHrsWrked.Size = new System.Drawing.Size(240, 27);
@@ -616,11 +620,34 @@
             this.txtTaxNum.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.txtTaxNum.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtTaxNum.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.txtTaxNum.Location = new System.Drawing.Point(0, 51);
+            this.txtTaxNum.Location = new System.Drawing.Point(0, 48);
             this.txtTaxNum.Multiline = true;
             this.txtTaxNum.Name = "txtTaxNum";
             this.txtTaxNum.Size = new System.Drawing.Size(240, 27);
             this.txtTaxNum.TabIndex = 0;
+            // 
+            // label19
+            // 
+            this.label19.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.label19.BackColor = System.Drawing.Color.White;
+            this.label19.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.label19.Location = new System.Drawing.Point(0, 140);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(240, 28);
+            this.label19.TabIndex = 0;
+            this.label19.Text = "Current Wage for month";
+            this.label19.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // txtCurrWage
+            // 
+            this.txtCurrWage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtCurrWage.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txtCurrWage.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.txtCurrWage.Location = new System.Drawing.Point(0, 140);
+            this.txtCurrWage.Multiline = true;
+            this.txtCurrWage.Name = "txtCurrWage";
+            this.txtCurrWage.Size = new System.Drawing.Size(240, 27);
+            this.txtCurrWage.TabIndex = 0;
             // 
             // frmEmpInfo
             // 
@@ -697,6 +724,8 @@
         private System.Windows.Forms.TextBox txtHrsWrked;
         private System.Windows.Forms.TextBox txtTaxNum;
         private System.Windows.Forms.Button btnBack;
+        private System.Windows.Forms.Label label19;
+        private System.Windows.Forms.TextBox txtCurrWage;
     }
 }
 

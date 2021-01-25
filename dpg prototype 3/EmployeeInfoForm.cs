@@ -52,11 +52,12 @@ namespace DPG_prototype_v2
             txtTaxNum.Text = table.Rows[0][6].ToString();
             txtHrsWrked.Text = table.Rows[0][7].ToString();
             txtRenumPerHr.Text = table.Rows[0][8].ToString();
-            txtTransComplt.Text = table.Rows[0][9].ToString();
-            txtRevGen.Text = table.Rows[0][10].ToString();
-            txtMostHelpedCust.Text = table.Rows[0][11].ToString();
-            txtNumOfItems.Text = table.Rows[0][12].ToString();
-            txtTotalVal.Text = table.Rows[0][13].ToString();
+            txtCurrWage.Text = table.Rows[0][9].ToString();
+            txtTransComplt.Text = table.Rows[0][10].ToString();
+            txtRevGen.Text = table.Rows[0][11].ToString();
+            txtMostHelpedCust.Text = table.Rows[0][12].ToString();
+            txtNumOfItems.Text = table.Rows[0][13].ToString();
+            txtTotalVal.Text = table.Rows[0][14].ToString();
 
             //set txt to read only
             txtID.ReadOnly = true;
@@ -68,6 +69,7 @@ namespace DPG_prototype_v2
             txtTaxNum.ReadOnly = true;
             txtHrsWrked.ReadOnly = true;
             txtRenumPerHr.ReadOnly = true;
+            txtCurrWage.ReadOnly = true;
             txtTransComplt.ReadOnly = true;
             txtRevGen.ReadOnly = true;
             txtMostHelpedCust.ReadOnly = true;

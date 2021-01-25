@@ -14,6 +14,7 @@ namespace DPG_prototype_v2
     {
         private DataBaseManager dbM;
         private int id;
+
         public frmMainMenu(int id,ref DataBaseManager dbM)
         {
             InitializeComponent();
@@ -28,7 +29,30 @@ namespace DPG_prototype_v2
 
         private void frmMainMenu_Load(object sender, EventArgs e)
         {
+            DataTable posTable = new DataTable();
+            dbM.execQry("SELECT Position_ID FROM Employee WHERE Employee_ID=" + id, ref posTable);
+            int posID = int.Parse(posTable.Rows[0][0].ToString());
 
+            if (posID == 1)    //manager id
+            {
+                btnHR.Enabled = false;
+            }
+            if (posID == 2)    //cashier id
+            {
+                btnMng.Enabled = false;
+                btnHR.Enabled = false;
+            }
+            if (posID == 3)     //hr id
+            {
+                btnPOS.Enabled = false;
+                btnMng.Enabled = false;
+            }
+            if (posID > 3003)   //other positions that dont use the system
+            {
+                btnPOS.Enabled = false;
+                btnMng.Enabled = false;
+                btnHR.Enabled = false;
+            }
         }
 
         private void btnPOS_Click(object sender, EventArgs e)
