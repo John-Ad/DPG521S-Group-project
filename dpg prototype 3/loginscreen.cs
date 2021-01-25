@@ -46,6 +46,7 @@ namespace DPG_prototype_v2
                     {
                         if (loginTable.Rows[0][2].ToString() == password_textbox.Text)
                         {
+                            dbM.execNonQry("exec sp_LoginLogInsert " + loginTable.Rows[0][0].ToString());
                             frmMainMenu frmMainMenu = new frmMainMenu(int.Parse(loginTable.Rows[0][0].ToString()), ref dbM);
                             frmMainMenu.ShowDialog();
                             frmMainMenu.Dispose();

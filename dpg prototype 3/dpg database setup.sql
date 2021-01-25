@@ -49,7 +49,12 @@ CREATE TABLE loginpage(
 	login_username varchar(20) NOT NULL, 
     Login_password varchar(20) NOT Null, 
 );
-go
+CREATE TABLE LoginLog(
+    Log_ID int PRIMARY KEY IDENTITY(1,1),
+    Employee_ID int NOT NULL,
+    _Date datetime NOT NULL
+    FOREIGN KEY (Employee_ID) REFERENCES Employee(Employee_ID)
+);
 CREATE TABLE Equipment(
     Equipment_ID int PRIMARY KEY IDENTITY(4001,1),  --all equipment ids are > 4000 and < 5000
     Employee_ID int NOT NULL,
@@ -294,6 +299,21 @@ END
 go
 
 exec sp_LogInsert 3003,'jeff','12345678'
+go
+
+--logs user login info whenever a user logs on
+drop proc if exists sp_LoginLogInsert
+go
+CREATE PROC sp_LoginLogInsert(
+    @empID AS int=NULL
+)
+AS
+BEGIN
+    if(@empID NOT IN(SELECT Employee_ID FROM Employee))
+        THROW 50001,'Employee does not exist',1
+    else
+        INSERT INTO LoginLog VALUES(@empID,GETDATE())
+END
 go
 
 --equipment insert function
@@ -755,6 +775,12 @@ AS
 BEGIN
     if(@id IN (SELECT Employee_ID FROM Employee))
         BEGIN
+            if(@id NOT IN(SELECT Employee_ID FROM Payroll))     --new employees might not have payroll data yet
+            BEGIN
+                THROW 50010,'This employee has no payroll data! Please enter this data into the system before trying to view employee information.',2
+                RETURN
+            END
+
             --declare variables
             DECLARE @numOfTrans AS int, @numOfEqp AS int,
                     @totalRev AS int, @totalEqVal AS int, @mostHelpedCus AS varchar(20)
@@ -1097,6 +1123,26 @@ BEGIN
 END
 go
 
+drop trigger if exists trg_LoginLog
+go
+CREATE TRIGGER trg_LoginLog
+ON LoginLog
+AFTER INSERT
+AS
+BEGIN
+    DECLARE @empID AS int=(SELECT Employee_ID FROM inserted), @date AS date=(SELECT _Date FROM inserted)
+    if((SELECT COUNT(*) FROM LoginLog WHERE Employee_ID=@empID AND CAST(_Date AS date)=@date)=1)
+    BEGIN
+        UPDATE Payroll
+        SET Hrs_Worked_Month=Hrs_Worked_Month+8
+        WHERE Employee_ID=@empID
+    END
+END
+go
+
+
+
+
 
 
 
@@ -1172,7 +1218,6 @@ go
 
 
 
-*/
 
 
 
@@ -1201,4 +1246,5 @@ INNER JOIN Transaction_Performed ON Service_Rendered.Transaction_ID=Transaction_
 GROUP BY Service_Rendered.Haircut_ID, Haircut_Name
 
 
+*/
 
