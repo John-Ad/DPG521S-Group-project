@@ -724,7 +724,7 @@ BEGIN
     SET @recCount=(SELECT COUNT(*) FROM Profit_Loss_Data WHERE _Year=@year AND _Month=@month)
     if(@recCount=0)
     BEGIN
-        THROW 50002,'Cannot edit records other than the one for the current month!',6
+        THROW 50002,'The profit/loss record for the current month does not exist. Please have the manager add this record before continuing',6
         RETURN
     END
 
@@ -998,10 +998,10 @@ BEGIN
         RETURN
     END
 
-    SELECT SUM(Service_Rendered.Total_Amount) AS Total_Sales FROM Service_Rendered INNER JOIN Transaction_Performed ON Service_Rendered.Transaction_ID=Transaction_Performed.Transaction_ID
+    SELECT CASE WHEN SUM(Service_Rendered.Total_Amount) IS NULL THEN 0 ELSE SUM(Service_Rendered.Total_Amount) END AS Total_Sales FROM Service_Rendered INNER JOIN Transaction_Performed ON Service_Rendered.Transaction_ID=Transaction_Performed.Transaction_ID
     WHERE Transaction_Performed.Date_of_Purchase>=@start AND Transaction_Performed.Date_of_Purchase<=@end 
-    UNION
-    SELECT SUM(Product_Sold.Total_Amount) AS Prod FROM Product_Sold INNER JOIN Transaction_Performed ON Product_Sold.Transaction_ID=Transaction_Performed.Transaction_ID
+    UNION ALL
+    SELECT CASE WHEN SUM(Product_Sold.Total_Amount) IS NULL THEN 0 ELSE SUM(Product_Sold.Total_Amount) END AS Total_Sales FROM Product_Sold INNER JOIN Transaction_Performed ON Product_Sold.Transaction_ID=Transaction_Performed.Transaction_ID
     WHERE Transaction_Performed.Date_of_Purchase>=@start AND Transaction_Performed.Date_of_Purchase<=@end 
 END
 go

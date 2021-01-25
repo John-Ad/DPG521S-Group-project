@@ -228,7 +228,7 @@
             this.txtQuantity.Multiline = true;
             this.txtQuantity.Name = "txtQuantity";
             this.txtQuantity.Size = new System.Drawing.Size(290, 41);
-            this.txtQuantity.TabIndex = 0;
+            this.txtQuantity.TabIndex = 3;
             // 
             // txtPrice
             // 
@@ -238,7 +238,7 @@
             this.txtPrice.Multiline = true;
             this.txtPrice.Name = "txtPrice";
             this.txtPrice.Size = new System.Drawing.Size(290, 41);
-            this.txtPrice.TabIndex = 0;
+            this.txtPrice.TabIndex = 2;
             // 
             // txtDesc
             // 
@@ -248,7 +248,7 @@
             this.txtDesc.Multiline = true;
             this.txtDesc.Name = "txtDesc";
             this.txtDesc.Size = new System.Drawing.Size(290, 41);
-            this.txtDesc.TabIndex = 0;
+            this.txtDesc.TabIndex = 1;
             // 
             // txtID
             // 

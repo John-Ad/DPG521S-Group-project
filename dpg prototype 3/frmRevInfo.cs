@@ -57,45 +57,6 @@ namespace DPG_prototype_v2
             btnCurrM.PerformClick();
         }
 
-        /*
-        private bool executeQuery(String query, ref DataTable table)
-        {
-            if (cboSearchType.SelectedIndex == -1)
-            {
-                MessageBox.Show("Please select a search type!", "Failed to execute query", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-
-            if (cmd != null)
-            {
-                cmd.Dispose();
-            }
-            if (adapter != null)
-            {
-                adapter.Dispose();
-            }
-            if(table.Rows.Count>0)
-            {
-                table.Dispose();
-                table = new DataTable();
-            }
-
-            try
-            {
-                cmd = new String(query, connection);
-                adapter = new SqlDataAdapter();
-                adapter.SelectCommand = cmd;
-                adapter.Fill(table);
-                return true;
-            }
-            catch(SqlException ex)
-            {
-                MessageBox.Show(ex.Message, "Failed to execute query", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-        }
-        */
-
         private void setTop3(ref DataTable table, bool setHair)
         {
             if (setHair)
@@ -234,24 +195,11 @@ namespace DPG_prototype_v2
             }
         }
 
-        private void setRevGen(ref DataTable table)     //broken! fix------------------------------------------------------------------------------------>
+        private void setRevGen(ref DataTable table)
         {
-            if (table.Rows.Count > 0)
-            {
-                txtRevHair.Text = table.Rows[0][0].ToString();
-                if (table.Rows.Count > 1)
-                {
-                    txtRevProd.Text = table.Rows[1][0].ToString();
-                    txtRevTotal.Text = ((Decimal)table.Rows[0][0] + (Decimal)table.Rows[1][0]).ToString();
-                    return;
-                }
-                txtRevProd.Text = "0.00";
-                txtRevTotal.Text = table.Rows[0][0].ToString();
-            }
-            else
-            {
-                MessageBox.Show("There have been no sales during this time period!");
-            }
+            txtRevHair.Text = table.Rows[0][0].ToString();
+            txtRevProd.Text = table.Rows[1][0].ToString();
+            txtRevTotal.Text = ((Decimal)table.Rows[0][0] + (Decimal)table.Rows[1][0]).ToString();
         }
 
         private void btnCurrD_Click(object sender, EventArgs e)

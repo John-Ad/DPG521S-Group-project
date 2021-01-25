@@ -212,7 +212,7 @@
             this.txtNumOfVis.Location = new System.Drawing.Point(1, 216);
             this.txtNumOfVis.Name = "txtNumOfVis";
             this.txtNumOfVis.Size = new System.Drawing.Size(290, 41);
-            this.txtNumOfVis.TabIndex = 0;
+            this.txtNumOfVis.TabIndex = 2;
             // 
             // txtCellNum
             // 
@@ -223,7 +223,7 @@
             this.txtCellNum.MaxLength = 10;
             this.txtCellNum.Name = "txtCellNum";
             this.txtCellNum.Size = new System.Drawing.Size(290, 41);
-            this.txtCellNum.TabIndex = 0;
+            this.txtCellNum.TabIndex = 1;
             this.txtCellNum.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtCellNum_KeyPress);
             // 
             // txtID
@@ -271,6 +271,7 @@
             this.btnDelete.Name = "btnDelete";
             this.btnDelete.Size = new System.Drawing.Size(139, 23);
             this.btnDelete.TabIndex = 0;
+            this.btnDelete.TabStop = false;
             this.btnDelete.Text = "Delete";
             this.btnDelete.UseVisualStyleBackColor = true;
             this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
@@ -282,6 +283,7 @@
             this.btnFirst.Name = "btnFirst";
             this.btnFirst.Size = new System.Drawing.Size(139, 23);
             this.btnFirst.TabIndex = 0;
+            this.btnFirst.TabStop = false;
             this.btnFirst.Text = "First";
             this.btnFirst.UseVisualStyleBackColor = true;
             this.btnFirst.Click += new System.EventHandler(this.btnFirst_Click);
@@ -293,6 +295,7 @@
             this.btnEdit.Name = "btnEdit";
             this.btnEdit.Size = new System.Drawing.Size(139, 23);
             this.btnEdit.TabIndex = 0;
+            this.btnEdit.TabStop = false;
             this.btnEdit.Text = "Edit";
             this.btnEdit.UseVisualStyleBackColor = true;
             this.btnEdit.Click += new System.EventHandler(this.btnEdit_Click);
@@ -304,6 +307,7 @@
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(139, 23);
             this.btnSave.TabIndex = 0;
+            this.btnSave.TabStop = false;
             this.btnSave.Text = "Save";
             this.btnSave.UseVisualStyleBackColor = true;
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
@@ -315,6 +319,7 @@
             this.btnPrev.Name = "btnPrev";
             this.btnPrev.Size = new System.Drawing.Size(139, 23);
             this.btnPrev.TabIndex = 0;
+            this.btnPrev.TabStop = false;
             this.btnPrev.Text = "Prev";
             this.btnPrev.UseVisualStyleBackColor = true;
             this.btnPrev.Click += new System.EventHandler(this.btnPrev_Click);
@@ -340,6 +345,7 @@
             this.btnAddNew.Name = "btnAddNew";
             this.btnAddNew.Size = new System.Drawing.Size(139, 23);
             this.btnAddNew.TabIndex = 0;
+            this.btnAddNew.TabStop = false;
             this.btnAddNew.Text = "Add New";
             this.btnAddNew.UseVisualStyleBackColor = true;
             this.btnAddNew.Click += new System.EventHandler(this.btnAddNew_Click);
@@ -351,6 +357,7 @@
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(139, 23);
             this.btnCancel.TabIndex = 0;
+            this.btnCancel.TabStop = false;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
@@ -362,6 +369,7 @@
             this.btnDone.Name = "btnDone";
             this.btnDone.Size = new System.Drawing.Size(139, 23);
             this.btnDone.TabIndex = 0;
+            this.btnDone.TabStop = false;
             this.btnDone.Text = "Done";
             this.btnDone.UseVisualStyleBackColor = true;
             this.btnDone.Click += new System.EventHandler(this.btnDone_Click);
@@ -373,6 +381,7 @@
             this.btnLast.Name = "btnLast";
             this.btnLast.Size = new System.Drawing.Size(139, 23);
             this.btnLast.TabIndex = 0;
+            this.btnLast.TabStop = false;
             this.btnLast.Text = "Last";
             this.btnLast.UseVisualStyleBackColor = true;
             this.btnLast.Click += new System.EventHandler(this.btnLast_Click);
@@ -384,6 +393,7 @@
             this.btnNext.Name = "btnNext";
             this.btnNext.Size = new System.Drawing.Size(139, 23);
             this.btnNext.TabIndex = 0;
+            this.btnNext.TabStop = false;
             this.btnNext.Text = "Next";
             this.btnNext.UseVisualStyleBackColor = true;
             this.btnNext.Click += new System.EventHandler(this.btnNext_Click);

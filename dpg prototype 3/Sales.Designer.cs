@@ -37,6 +37,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.btnDone = new System.Windows.Forms.Button();
             this.btnFinish = new System.Windows.Forms.Button();
             this.cboCustName = new System.Windows.Forms.ComboBox();
             this.txtTotal = new System.Windows.Forms.TextBox();
@@ -65,7 +66,6 @@
             this.cboHairName = new System.Windows.Forms.ComboBox();
             this.txtHairProdID = new System.Windows.Forms.TextBox();
             this.panel7 = new System.Windows.Forms.Panel();
-            this.btnDone = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -200,6 +200,19 @@
             this.panel2.Size = new System.Drawing.Size(180, 373);
             this.panel2.TabIndex = 1;
             // 
+            // btnDone
+            // 
+            this.btnDone.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnDone.BackColor = System.Drawing.Color.White;
+            this.btnDone.FlatAppearance.BorderColor = System.Drawing.Color.Black;
+            this.btnDone.Location = new System.Drawing.Point(1, 261);
+            this.btnDone.Name = "btnDone";
+            this.btnDone.Size = new System.Drawing.Size(179, 30);
+            this.btnDone.TabIndex = 3;
+            this.btnDone.Text = "Done";
+            this.btnDone.UseVisualStyleBackColor = false;
+            this.btnDone.Click += new System.EventHandler(this.btnDone_Click);
+            // 
             // btnFinish
             // 
             this.btnFinish.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
@@ -221,7 +234,7 @@
             this.cboCustName.Location = new System.Drawing.Point(2, 149);
             this.cboCustName.Name = "cboCustName";
             this.cboCustName.Size = new System.Drawing.Size(179, 33);
-            this.cboCustName.TabIndex = 2;
+            this.cboCustName.TabIndex = 1;
             this.cboCustName.SelectedIndexChanged += new System.EventHandler(this.cboCustName_SelectedIndexChanged);
             // 
             // txtTotal
@@ -484,7 +497,7 @@
             this.cboBarberName.Location = new System.Drawing.Point(0, 74);
             this.cboBarberName.Name = "cboBarberName";
             this.cboBarberName.Size = new System.Drawing.Size(176, 33);
-            this.cboBarberName.TabIndex = 2;
+            this.cboBarberName.TabIndex = 3;
             // 
             // cboProdName
             // 
@@ -494,7 +507,7 @@
             this.cboProdName.Location = new System.Drawing.Point(0, 103);
             this.cboProdName.Name = "cboProdName";
             this.cboProdName.Size = new System.Drawing.Size(177, 33);
-            this.cboProdName.TabIndex = 2;
+            this.cboProdName.TabIndex = 4;
             this.cboProdName.SelectedIndexChanged += new System.EventHandler(this.cboProdName_SelectedIndexChanged);
             // 
             // txtQuantity
@@ -520,6 +533,7 @@
             this.txtPrice.ReadOnly = true;
             this.txtPrice.Size = new System.Drawing.Size(177, 23);
             this.txtPrice.TabIndex = 1;
+            this.txtPrice.TabStop = false;
             // 
             // cboHairName
             // 
@@ -552,19 +566,6 @@
             this.panel7.Name = "panel7";
             this.panel7.Size = new System.Drawing.Size(177, 30);
             this.panel7.TabIndex = 2;
-            // 
-            // btnDone
-            // 
-            this.btnDone.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnDone.BackColor = System.Drawing.Color.White;
-            this.btnDone.FlatAppearance.BorderColor = System.Drawing.Color.Black;
-            this.btnDone.Location = new System.Drawing.Point(1, 261);
-            this.btnDone.Name = "btnDone";
-            this.btnDone.Size = new System.Drawing.Size(179, 30);
-            this.btnDone.TabIndex = 3;
-            this.btnDone.Text = "Done";
-            this.btnDone.UseVisualStyleBackColor = false;
-            this.btnDone.Click += new System.EventHandler(this.btnDone_Click);
             // 
             // frmSales
             // 

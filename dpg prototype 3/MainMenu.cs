@@ -33,11 +33,11 @@ namespace DPG_prototype_v2
             dbM.execQry("SELECT Position_ID FROM Employee WHERE Employee_ID=" + id, ref posTable);
             int posID = int.Parse(posTable.Rows[0][0].ToString());
 
-            if (posID == 1)    //manager id
+            if (posID == 2)    //manager id
             {
                 btnHR.Enabled = false;
             }
-            if (posID == 2)    //cashier id
+            if (posID == 1)    //cashier id
             {
                 btnMng.Enabled = false;
                 btnHR.Enabled = false;

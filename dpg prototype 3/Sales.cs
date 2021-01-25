@@ -56,7 +56,7 @@ namespace DPG_prototype_v2
                 prodCommand = "SELECT * FROM Product";
                 empCommand = "SELECT * FROM Employee WHERE Employee_ID="+id.ToString();
                 custCommand = "SELECT * FROM Customer";
-                barberCommand = "SELECT * FROM Employee WHERE Position_ID=3";
+                barberCommand = "SELECT * FROM Employee WHERE Position_ID=4";
                 //establish data adapters and tables
                 hairTable = new DataTable();
                 prodTable = new DataTable();
